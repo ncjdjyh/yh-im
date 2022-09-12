@@ -1,4 +1,4 @@
-package com.neo.yhrpc.common;
+package com.neo.yhrpc.util;
 
 import java.util.UUID;
 

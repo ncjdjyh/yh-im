@@ -1,6 +1,6 @@
 package com.neo.yhrpc.common;
 
-import lombok.AllArgsConstructor;
+import com.neo.yhrpc.util.RequestId;
 import lombok.Data;
 
 import java.time.LocalDateTime;

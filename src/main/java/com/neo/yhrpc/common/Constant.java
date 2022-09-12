@@ -10,4 +10,9 @@ public class Constant {
         String LOGOUT = "logout";
         String MESSAGE = "message";
     }
+
+    public interface PresenceState {
+        Integer OFFLINE = 0;
+        Integer ONLINE = 1;
+    }
 }

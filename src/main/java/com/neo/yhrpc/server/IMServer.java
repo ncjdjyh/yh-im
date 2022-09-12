@@ -1,9 +1,6 @@
 package com.neo.yhrpc.server;
 
-import com.neo.yhrpc.common.MessageDecoder;
-import com.neo.yhrpc.common.MessageEncoder;
-import com.neo.yhrpc.common.MessageOutput;
-import com.neo.yhrpc.common.RequestId;
+import com.neo.yhrpc.common.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -27,7 +24,7 @@ public class IMServer {
     public IMServer(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        collector = new ServerMessageCollector();
+        collector = new ServerMessageCollector(new HostAddress(getIp(), getPort()));
     }
 
     public void start() {
@@ -47,12 +44,30 @@ public class IMServer {
                         }
                     });
             ChannelFuture c = bootstrap.bind(ip, port).syncUninterruptibly();
+            RegisterCenter.register(this);
             System.out.println("service at " + ip + ":" + port);
             c.channel().closeFuture().syncUninterruptibly();
         } finally {
             System.out.println("service over");
+            RegisterCenter.deregister(this);
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }

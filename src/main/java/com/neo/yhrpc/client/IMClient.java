@@ -1,12 +1,14 @@
 package com.neo.yhrpc.client;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.neo.yhrpc.common.*;
+import com.neo.yhrpc.util.RequestId;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 
 /**
  * @Author: neo
@@ -26,7 +28,7 @@ public class IMClient {
         this.port = port;
         this.clientId = clientId;
         init();
-        login();
+        loginIMServer(this.clientId);
     }
 
     public void sendMessage(String message, String type, Long from, Long to) {
@@ -39,8 +41,12 @@ public class IMClient {
         collector.send(output);
     }
 
-    public void login() {
-        sendMessage("", Constant.Command.LOGIN, this.clientId, null);
+    public void loginIMServer(Long clientId) {
+        sendMessage("", Constant.Command.LOGIN, clientId, null);
+    }
+
+    public void logoutIMServer(Long clientId) {
+        sendMessage("", Constant.Command.LOGOUT, clientId, null);
     }
 
     public void sendMessage(String message, Long to) {
@@ -48,6 +54,11 @@ public class IMClient {
     }
 
     private void init() {
+        Instance instance = RegisterCenter.getInstance();
+        if (ObjectUtil.isNull(instance)) {
+            throw new BizException("no available service");
+        }
+
         group = new NioEventLoopGroup(1);
         bootstrap = new Bootstrap();
         bootstrap.group(group);
@@ -63,7 +74,7 @@ public class IMClient {
 
         });
         bootstrap.option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.SO_KEEPALIVE, true);
-        ChannelFuture f = bootstrap.connect(ip, port).syncUninterruptibly();
+        ChannelFuture f = bootstrap.connect(instance.getIp(), instance.getPort()).syncUninterruptibly();
         f.channel().closeFuture().addListener(future -> close());
     }
 
