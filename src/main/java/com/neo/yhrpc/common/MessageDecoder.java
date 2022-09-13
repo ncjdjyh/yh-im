@@ -9,6 +9,7 @@ import io.netty.util.CharsetUtil;
 import java.util.List;
 
 /**
+ * TODO 编码解码考虑是否可以优化
  * @Author: neo
  * @FirstInitial: 2019/7/13
  * @Description: ~

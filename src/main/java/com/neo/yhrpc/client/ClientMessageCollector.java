@@ -1,8 +1,9 @@
 package com.neo.yhrpc.client;
 
 import com.neo.yhrpc.common.*;
+import com.neo.yhrpc.common.MessageInput;
+import com.neo.yhrpc.common.MessageOutput;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**

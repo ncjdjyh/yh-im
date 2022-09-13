@@ -5,17 +5,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.neo.yhrpc.common.Constant;
-import com.neo.yhrpc.common.Message;
-import com.neo.yhrpc.common.MessageInput;
-import com.neo.yhrpc.common.MessageOutput;
+import com.neo.yhrpc.common.*;
 import com.neo.yhrpc.presence.IPresenceService;
 import com.neo.yhrpc.presence.MemoryPresenceService;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,7 +50,7 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
                     System.out.println(messageTo + "当前不在线");
                     return;
                 }
-                sendMessageToServer(hostAddress, message);
+                sendMessageToHostAddress(hostAddress, message);
             }
             System.out.println("server receiveMessage:" + msg.getType() + "&" + message.getContent());
             return;
@@ -62,13 +58,13 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
         System.out.println("message is empty!");
     }
 
-    private void sendMessageToServer(HostAddress hostAddress, Message message) {
-        // TODO 暂时用 httpClient 要改为 RPC 调用链路
+    private void sendMessageToHostAddress(HostAddress hostAddress, Message message) {
+        // TODO 考虑在服务端做消息分发是否合理
         JSONObject paramMap = JSONUtil.parseObj(message);
-        HttpUtil.post(hostAddress.getUrl() + "/sendMessage", paramMap);
+        HttpUtil.post(hostAddress.getUrl() + "/api/sendMessage", paramMap);
     }
 
-    private void sendMessage(MessageInput payload) {
+    public void sendMessage(MessageInput payload) {
         Message message = payload.getPayload(Message.class);
         ChannelHandlerContext context = channelMap.get(message.getMessageTo());
         if (ObjectUtil.isNull(context)) {

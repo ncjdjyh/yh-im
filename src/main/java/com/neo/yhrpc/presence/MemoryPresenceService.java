@@ -2,10 +2,9 @@ package com.neo.yhrpc.presence;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.neo.yhrpc.common.Constant;
-import com.neo.yhrpc.server.HostAddress;
+import com.neo.yhrpc.common.HostAddress;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

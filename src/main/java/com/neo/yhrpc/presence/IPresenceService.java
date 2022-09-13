@@ -1,6 +1,6 @@
 package com.neo.yhrpc.presence;
 
-import com.neo.yhrpc.server.HostAddress;
+import com.neo.yhrpc.common.HostAddress;
 
 /**
  * @author: ncjdjyh

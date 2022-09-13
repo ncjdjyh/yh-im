@@ -1,7 +1,7 @@
 package com.neo.yhrpc.presence;
 
 import com.neo.yhrpc.common.Constant;
-import com.neo.yhrpc.server.HostAddress;
+import com.neo.yhrpc.common.HostAddress;
 import lombok.Data;
 
 import java.time.LocalDateTime;

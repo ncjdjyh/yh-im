@@ -25,6 +25,7 @@ public class IMServer {
         this.ip = ip;
         this.port = port;
         collector = new ServerMessageCollector(new HostAddress(getIp(), getPort()));
+        start();
     }
 
     public void start() {
@@ -53,6 +54,11 @@ public class IMServer {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
+    }
+
+    public void sendMessage(Message message) {
+        MessageInput messageInput =
+        return collector.sendMessage(messageInput);
     }
 
     public String getIp() {

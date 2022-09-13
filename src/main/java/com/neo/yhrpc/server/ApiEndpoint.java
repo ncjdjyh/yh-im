@@ -1,6 +1,8 @@
 package com.neo.yhrpc.server;
 
 import cn.hutool.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,8 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("/api")
 public class ApiEndpoint {
+    @Autowired
+    private IMServer imServer;
+
     @PostMapping("/sendMessage")
     public JSONObject sendMessage() {
-        return null;
+        imServer
+    }
+
+    @Bean
+    IMServer imServer() {
+        return new IMServer("127.0.0.1", 8000);
     }
 }

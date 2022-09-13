@@ -1,4 +1,4 @@
-package com.neo.yhrpc.server;
+package com.neo.yhrpc.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
