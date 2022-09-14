@@ -9,7 +9,7 @@ import com.neo.yhrpc.common.HostAddress;
 public interface IPresenceService {
     boolean activeUserState(Long clientId, HostAddress hostAddress);
 
-    HostAddress getConnectServerAddress(Long clientId);
+    HostAddress getConnectedServer(Long clientId);
 
     boolean inActiveUserState(Long clientId);
 }

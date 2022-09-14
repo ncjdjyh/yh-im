@@ -45,9 +45,9 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
                 channelMap.remove(messageFrom);
             }
             if (StrUtil.equals(msg.getType(), Constant.Command.MESSAGE)) {
-                HostAddress hostAddress = presenceService.getConnectServerAddress(messageTo);
+                HostAddress hostAddress = presenceService.getConnectedServer(messageTo);
                 if (ObjectUtil.isNull(hostAddress)) {
-                    System.out.println(messageTo + "当前不在线");
+                    System.out.println(messageTo + "当前用户不在线");
                     return;
                 }
                 sendMessageToHostAddress(hostAddress, message);

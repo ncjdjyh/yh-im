@@ -24,7 +24,7 @@ public class MemoryPresenceService implements IPresenceService {
     }
 
     @Override
-    public HostAddress getConnectServerAddress(Long clientId) {
+    public HostAddress getConnectedServer(Long clientId) {
         UserState userState = table.get(clientId);
         if (ObjectUtil.isNotNull(userState) && userState.online()) {
             return userState.getConnectedServer();
