@@ -2,9 +2,7 @@ package com.neo.im.server;
 
 import com.neo.im.common.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author: ncjdjyh
@@ -17,7 +15,7 @@ public class ApiEndpoint {
     private IMServer imServer;
 
     @PostMapping("/sendMessage")
-    public void sendMessage(Message message) {
+    public void sendMessage(@RequestBody Message message) {
         imServer.sendMessage(message);
     }
 }

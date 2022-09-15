@@ -54,16 +54,15 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
             if (StrUtil.equals(msg.getType(), Constant.Command.MESSAGE)) {
                 sendMessage(message);
             }
-            System.out.println("server receiveMessage:" + msg.getType() + ".." + message.getContent());
+            log.info("channel read message... type:{} content:{}", msg.getType(), message.getContent());
             return;
         }
-        System.out.println("message is empty!");
+        log.info("message is empty!");
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("服务端异常获取...", cause);
-        super.exceptionCaught(ctx, cause);
+        log.error("server caught a exception...", cause);
     }
 
     private void sendMessage(Message message) {
@@ -75,16 +74,13 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
             return;
         }
 
-        JSONObject paramMap = JSONUtil.parseObj(message);
-        HttpUtil.post(toAddress.getHttpUrl() + "/api/sendMessage", paramMap);
-
-//        boolean connectToCurrentServer = toAddress.sameConnectServer(getHostAddress());
-//        if (connectToCurrentServer) {
-//            sendMessageToChannel(message);
-//        } else {
-//            JSONObject paramMap = JSONUtil.parseObj(message);
-//            HttpUtil.post(toAddress.getUrl() + "/api/sendMessage", paramMap);
-//        }
+        boolean connectToCurrentServer = toAddress.sameConnectServer(getHostAddress());
+        if (connectToCurrentServer) {
+            sendMessageToChannel(message);
+        } else {
+            String params = JSONUtil.toJsonStr(message, JSONConfig.create().setDateFormat(DatePattern.NORM_DATETIME_PATTERN));
+            HttpUtil.post(toAddress.getHttpUrl() + "/api/sendMessage", params);
+        }
     }
 
     public void sendMessageToChannel(Message message) {
@@ -102,7 +98,7 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
         log.warn("channelInactive:{}", ctx.name());
         channelMap.forEach((k, v) -> {
             if (v == ctx) {
-                // TODO 数据一致性问题如何解决
+                log.info("remove client connection..id:{}", k);
                 channelMap.remove(k);
                 presenceService.inActiveUserState(k);
             }

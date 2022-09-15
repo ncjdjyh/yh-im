@@ -1,5 +1,6 @@
 package com.neo.im.common;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.neo.im.util.RequestId;
@@ -18,8 +19,8 @@ public class Message {
     private Long messageFrom;
     private Long messageTo;
     private String content;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
+    @JsonFormat(timezone = "GMT+8", pattern = DatePattern.NORM_DATETIME_PATTERN)
     private Date createTime;
 
     public Message(Long messageFrom, Long messageTo, String content) {

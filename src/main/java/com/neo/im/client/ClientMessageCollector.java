@@ -5,12 +5,14 @@ import com.neo.im.common.MessageInput;
 import com.neo.im.common.MessageOutput;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Author: neo
  * @FirstInitial: 2019/7/13
  * @Description: ~
  */
+@Slf4j
 public class ClientMessageCollector extends SimpleChannelInboundHandler<MessageInput> {
     private ChannelHandlerContext context;
 
@@ -18,6 +20,11 @@ public class ClientMessageCollector extends SimpleChannelInboundHandler<MessageI
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         this.context = ctx;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("client caught a exception..", cause);
     }
 
     @Override
@@ -35,6 +42,7 @@ public class ClientMessageCollector extends SimpleChannelInboundHandler<MessageI
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        log.info("client channel inActive...{}", ctx.name());
         super.channelInactive(ctx);
     }
 }

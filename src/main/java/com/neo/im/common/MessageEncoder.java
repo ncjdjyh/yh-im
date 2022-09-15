@@ -1,5 +1,7 @@
 package com.neo.im.common;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -20,7 +22,7 @@ public class MessageEncoder extends MessageToMessageEncoder<MessageOutput> {
         ByteBuf buf = PooledByteBufAllocator.DEFAULT.directBuffer();
         writeStr(buf, msg.getRequestId());
         writeStr(buf, msg.getType());
-        writeStr(buf, JSONUtil.toJsonStr(msg.getPayload()));
+        writeStr(buf, JSONUtil.toJsonStr(msg.getPayload(), JSONConfig.create().setDateFormat(DatePattern.NORM_DATETIME_MINUTE_PATTERN)));
         out.add(buf);
     }
 
