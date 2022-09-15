@@ -1,6 +1,5 @@
 package com.neo.im.server;
 
-import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.A;
 import com.neo.im.common.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -11,10 +10,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Host;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -58,7 +54,7 @@ public class IMServer {
                         }
                     });
             String ip = hostAddress.getIp();
-            int port = hostAddress.getPort();
+            int port = hostAddress.getImConnectPort();
             ChannelFuture c = bootstrap.bind(ip, port).syncUninterruptibly();
             RegisterCenter.register(hostAddress);
             log.info("service at " + ip + ":" + port);

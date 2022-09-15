@@ -1,10 +1,14 @@
 package com.neo.im.server;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.nacos.common.utils.DateFormatUtils;
 import com.neo.im.common.*;
 import com.neo.im.presence.IPresenceService;
 import io.netty.channel.ChannelHandler;
@@ -13,7 +17,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -58,25 +61,30 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("服务端异常:{}", ctx.name(), cause);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("服务端异常获取...", cause);
+        super.exceptionCaught(ctx, cause);
     }
 
     private void sendMessage(Message message) {
         Long messageTo = message.getMessageTo();
         HostAddress toAddress = presenceService.getConnectedServer(messageTo);
         if (ObjectUtil.isNull(toAddress)) {
-            System.out.println(messageTo + "当前用户不在线");
+            channelMap.remove(messageTo);
+            log.info("{}:当前用户不在线", messageTo);
             return;
         }
 
-        boolean connectToCurrentServer = toAddress.equals(getHostAddress());
-        if (connectToCurrentServer) {
-            sendMessageToChannel(message);
-        } else {
-            JSONObject paramMap = JSONUtil.parseObj(message);
-            HttpUtil.post(toAddress.getUrl() + "/api/sendMessage", paramMap);
-        }
+        JSONObject paramMap = JSONUtil.parseObj(message);
+        HttpUtil.post(toAddress.getHttpUrl() + "/api/sendMessage", paramMap);
+
+//        boolean connectToCurrentServer = toAddress.sameConnectServer(getHostAddress());
+//        if (connectToCurrentServer) {
+//            sendMessageToChannel(message);
+//        } else {
+//            JSONObject paramMap = JSONUtil.parseObj(message);
+//            HttpUtil.post(toAddress.getUrl() + "/api/sendMessage", paramMap);
+//        }
     }
 
     public void sendMessageToChannel(Message message) {
@@ -91,6 +99,7 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        log.warn("channelInactive:{}", ctx.name());
         channelMap.forEach((k, v) -> {
             if (v == ctx) {
                 // TODO 数据一致性问题如何解决

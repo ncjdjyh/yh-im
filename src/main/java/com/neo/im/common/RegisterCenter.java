@@ -4,7 +4,6 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
-import com.neo.im.server.IMServer;
 
 /**
  * @author: ncjdjyh
@@ -12,7 +11,7 @@ import com.neo.im.server.IMServer;
  */
 public class RegisterCenter {
     private static final String serverList = "127.0.0.1:8848";
-    private static String SERVICE_NAME = "IM_SERVICE";
+    private static final String SERVICE_NAME = "IM_SERVICE";
 
     private RegisterCenter() {
     }
@@ -27,7 +26,7 @@ public class RegisterCenter {
 
     public static void register(HostAddress hostAddress) {
         try {
-            createNamingService().registerInstance(SERVICE_NAME, hostAddress.getIp(), hostAddress.getPort());
+            createNamingService().registerInstance(SERVICE_NAME, hostAddress.getIp(), hostAddress.getImConnectPort());
         } catch (NacosException e) {
             throw new BizException("register rpcProvider exception!", e);
         }
@@ -35,7 +34,7 @@ public class RegisterCenter {
 
     public static void deregister(HostAddress hostAddress) {
         try {
-            createNamingService().deregisterInstance(SERVICE_NAME, hostAddress.getIp(), hostAddress.getPort());
+            createNamingService().deregisterInstance(SERVICE_NAME, hostAddress.getIp(), hostAddress.getImConnectPort());
         } catch (NacosException e) {
             throw new BizException("deregister rpcProvider exception!", e);
         }

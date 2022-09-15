@@ -14,10 +14,12 @@ public class Properties {
     @Value("${im.server.host}")
     private String ip;
     @Value("${im.server.port}")
-    private Integer port;
+    private Integer ImConnectPort;
+    @Value("${server.port}")
+    private Integer httpPort;
 
     @Bean
     public HostAddress currentServerHostAddress() {
-        return new HostAddress(ip, port);
+        return new HostAddress(ip, ImConnectPort, httpPort);
     }
 }

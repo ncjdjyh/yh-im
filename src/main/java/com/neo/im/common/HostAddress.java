@@ -1,10 +1,10 @@
 package com.neo.im.common;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * @author: ncjdjyh
@@ -15,27 +15,16 @@ import java.util.Objects;
 public class HostAddress implements Serializable {
     private static final long serialVersionUID = 4677120511873972139L;
     private String ip;
-    private int port;
+    private Integer ImConnectPort;
+    private Integer httpPort;
 
-    public String getUrl() {
-        return String.format("%s:%s", getIp(), getPort());
+    public boolean sameConnectServer(HostAddress hostAddress) {
+        return ObjectUtil.isNotNull(hostAddress)
+                && hostAddress.getIp().equals(getIp())
+                && hostAddress.getImConnectPort().equals(getImConnectPort());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        HostAddress that = (HostAddress) o;
-        return port == that.port &&
-                Objects.equals(ip, that.ip);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(ip, port);
+    public String getHttpUrl() {
+        return String.format("%s:%s", getIp(), getHttpPort());
     }
 }
