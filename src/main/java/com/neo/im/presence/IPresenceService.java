@@ -3,8 +3,8 @@ package com.neo.im.presence;
 import com.neo.im.common.HostAddress;
 
 /**
- * @author: ncjdjyh
- * @since: 2022/9/4
+ * @author ncjdjyh
+ * @since 2022/9/4
  */
 public interface IPresenceService {
     void activeUserState(Long clientId, HostAddress hostAddress);
@@ -13,5 +13,5 @@ public interface IPresenceService {
 
     HostAddress getConnectedServer(Long clientId);
 
-    boolean inActiveUserState(Long clientId);
+    void inActiveUserState(Long clientId);
 }

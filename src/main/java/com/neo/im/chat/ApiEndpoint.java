@@ -1,4 +1,4 @@
-package com.neo.im.server;
+package com.neo.im.chat;
 
 import com.neo.im.common.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class ApiEndpoint {
     @Autowired
-    private IMServer imServer;
+    private ChatServer chatServer;
 
     @PostMapping("/sendMessage")
     public void sendMessage(@RequestBody Message message) {
-        imServer.sendMessage(message);
+        chatServer.sendMessage(message);
     }
 }

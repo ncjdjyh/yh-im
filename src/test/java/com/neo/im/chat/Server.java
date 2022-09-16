@@ -1,4 +1,4 @@
-package com.neo.im.server;
+package com.neo.im.chat;
 
 /**
  * @author: ncjdjyh

@@ -1,4 +1,4 @@
-package com.neo.im.server.config;
+package com.neo.im.chat.config;
 
 import com.neo.im.common.HostAddress;
 import org.springframework.beans.factory.annotation.Value;

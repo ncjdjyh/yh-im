@@ -1,4 +1,4 @@
-package com.neo.im.server;
+package com.neo.im.chat;
 
 import com.neo.im.common.*;
 import io.netty.bootstrap.ServerBootstrap;
@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
  */
 @Service
 @Slf4j
-public class IMServer {
+public class ChatServer {
     @Autowired
     private ServerMessageCollector collector;
     @Autowired

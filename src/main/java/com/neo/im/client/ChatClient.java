@@ -10,14 +10,13 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * @Author: neo
  * @FirstInitial: 2019/7/13
  * @Description: ~
  */
-public class IMClient {
+public class ChatClient {
     private String ip;
     private int port;
     private EventLoopGroup group;
@@ -25,12 +24,17 @@ public class IMClient {
     private Bootstrap bootstrap;
     private Long clientId;
 
-    public IMClient(String host, int port, Long clientId) {
+    public ChatClient(String host, int port, Long clientId) {
         this.ip = host;
         this.port = port;
         this.clientId = clientId;
-        init();
-        loginIMServer(this.clientId);
+        connectChatServer();
+        connectPresenceServer();
+        loginPresenceServer(this.clientId);
+    }
+
+    private void connectPresenceServer() {
+
     }
 
     public void sendMessage(String message, String type, Long from, Long to) {
@@ -43,11 +47,11 @@ public class IMClient {
         collector.send(output);
     }
 
-    public void loginIMServer(Long clientId) {
+    public void loginPresenceServer(Long clientId) {
         sendMessage("", Constant.Command.LOGIN, clientId, null);
     }
 
-    public void logoutIMServer(Long clientId) {
+    public void logoutPresenceServer(Long clientId) {
         sendMessage("", Constant.Command.LOGOUT, clientId, null);
     }
 
@@ -55,7 +59,7 @@ public class IMClient {
         sendMessage(message, Constant.Command.MESSAGE, this.clientId, to);
     }
 
-    private void init() {
+    private void connectChatServer() {
         Instance instance = RegisterCenter.getInstance();
         if (ObjectUtil.isNull(instance)) {
             throw new BizException("no available service");

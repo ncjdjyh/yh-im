@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class Client1 {
     public static void main(String[] args) {
-        IMClient client1 = new IMClient("127.0.0.1", 8000, 1L);
+        ChatClient client1 = new ChatClient("127.0.0.1", 8000, 1L);
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
