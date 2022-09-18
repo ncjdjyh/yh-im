@@ -15,16 +15,16 @@ import java.io.Serializable;
 public class HostAddress implements Serializable {
     private static final long serialVersionUID = 4677120511873972139L;
     private String ip;
-    private Integer ImConnectPort;
-    private Integer httpPort;
+    private Integer apiPort;
+    private Integer chatPort;
 
-    public boolean sameConnectServer(HostAddress hostAddress) {
+    public boolean sameHostAddress(HostAddress hostAddress) {
         return ObjectUtil.isNotNull(hostAddress)
                 && hostAddress.getIp().equals(getIp())
-                && hostAddress.getImConnectPort().equals(getImConnectPort());
+                && hostAddress.getChatPort().equals(getChatPort());
     }
 
-    public String getHttpUrl() {
-        return String.format("%s:%s", getIp(), getHttpPort());
+    public String getUrl() {
+        return String.format("%s:%s", getIp(), getApiPort());
     }
 }

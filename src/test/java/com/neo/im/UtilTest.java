@@ -4,7 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.neo.im.common.Message;
+import com.neo.im.common.payload.Message;
 import org.junit.Test;
 
 /**

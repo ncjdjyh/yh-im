@@ -1,4 +1,4 @@
-package com.neo.im.common;
+package com.neo.im.common.tranform;
 
 import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
@@ -6,16 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @Author: neo
- * @FirstInitial: 2019/7/13
- * @Description: ~
+ * @Author neo
+ * @FirstInitial 2019/7/13
+ * @Description ~
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageInput {
     private String requestId;
-    private String type;
+    private Integer type;
     private String payload;
 
     public <T> T getPayload(Class<T> clazz) {

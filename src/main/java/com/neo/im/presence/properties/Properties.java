@@ -1,4 +1,4 @@
-package com.neo.im.chat.config;
+package com.neo.im.presence.properties;
 
 import cn.hutool.core.net.NetUtil;
 import com.neo.im.common.HostAddress;
@@ -12,13 +12,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class Properties {
-    @Value("${chat.server.port}")
-    private Integer chatPort;
+    @Value("${presence.server.port}")
+    private Integer presencePort;
     @Value("${server.port}")
     private Integer httpPort;
 
-    @Bean("chatServerHostAddress")
-    public HostAddress chatServerHostAddress() {
-        return new HostAddress(NetUtil.getLocalhostStr(), httpPort, chatPort);
+    @Bean("presenceServerHostAddress")
+    public HostAddress presenceServerHostAddress() {
+        return new HostAddress(NetUtil.getLocalhostStr(), httpPort, presencePort);
     }
 }

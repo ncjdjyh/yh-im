@@ -8,12 +8,12 @@ import java.util.Scanner;
  */
 public class Client2 {
     public static void main(String[] args) {
-        ChatClient client2 = new ChatClient("127.0.0.1", 8000, 2L);
+        ChatClient client2 = new ChatClient();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("请输入消息..");
             String message = scanner.nextLine();
-            client2.sendMessage(message, 1L);
+            client2.sendMessage(message, 2L, 1L);
         }
     }
 }

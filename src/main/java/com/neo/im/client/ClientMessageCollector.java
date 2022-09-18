@@ -1,16 +1,18 @@
 package com.neo.im.client;
 
-import com.neo.im.common.*;
-import com.neo.im.common.MessageInput;
-import com.neo.im.common.MessageOutput;
+import cn.hutool.core.util.ObjectUtil;
+import com.neo.im.common.payload.Message;
+import com.neo.im.common.tranform.MessageInput;
+import com.neo.im.common.tranform.MessageOutput;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
- * @Author: neo
- * @FirstInitial: 2019/7/13
- * @Description: ~
+ * @Author neo
+ * @FirstInitial 2019/7/13
+ * @Description ~
  */
 @Slf4j
 public class ClientMessageCollector extends SimpleChannelInboundHandler<MessageInput> {
@@ -35,7 +37,7 @@ public class ClientMessageCollector extends SimpleChannelInboundHandler<MessageI
 
     public void send(MessageOutput message) {
         ChannelHandlerContext ctx = this.context;
-        if (ctx != null) {
+        if (ObjectUtil.isNotNull(ctx) && ctx.channel().isActive()) {
             ctx.channel().eventLoop().execute(() -> this.context.writeAndFlush(message));
         }
     }

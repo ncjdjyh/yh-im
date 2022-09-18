@@ -1,4 +1,4 @@
-package com.neo.im.common;
+package com.neo.im.common.payload;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;

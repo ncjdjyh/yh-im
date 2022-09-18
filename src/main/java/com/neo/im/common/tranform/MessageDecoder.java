@@ -1,4 +1,4 @@
-package com.neo.im.common;
+package com.neo.im.common.tranform;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,9 +10,9 @@ import java.util.List;
 
 /**
  * TODO 编码解码考虑是否可以优化
- * @Author: neo
- * @FirstInitial: 2019/7/13
- * @Description: ~
+ * @Author neo
+ * @FirstInitial 2019/7/13
+ * @Description ~
  */
 public class MessageDecoder extends ReplayingDecoder<MessageInput> {
     @Override
