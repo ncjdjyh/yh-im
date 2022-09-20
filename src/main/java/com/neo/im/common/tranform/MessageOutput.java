@@ -15,10 +15,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MessageOutput {
     private String requestId;
-    private Integer type;
+    private String type;
     private Object payload;
 
-    public MessageOutput(Integer type, Object payload) {
+    public MessageOutput(String type, Object payload) {
         this.requestId = RequestId.next();
         this.type = type;
         this.payload = payload;

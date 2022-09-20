@@ -47,12 +47,7 @@ public class HeartbeatReceiver extends SimpleChannelInboundHandler<MessageInput>
     protected void channelRead0(ChannelHandlerContext ctx, MessageInput msg) {
         if (ObjectUtil.isNotNull(msg)) {
             Heartbeat heartBeat = msg.getPayload(Heartbeat.class);
-            log.info("receive heartbeat.. type:{}", msg.getType());
-            if (msg.getType() == Constant.Command.LOGIN) {
-                HostAddress hostAddress = JSONUtil.toBean(heartBeat.getContent(), HostAddress.class);
-                userStateService.activeState(heartBeat.getId(), hostAddress);
-                holder.put(heartBeat.getId(), ctx.channel());
-            }
+            log.debug("receive heartbeat.. content:{}", heartBeat.getContent());
         }
     }
 

@@ -1,4 +1,4 @@
-package com.neo.im.common;
+package com.neo.im.common.exception;
 
 /**
  * @Author: neo

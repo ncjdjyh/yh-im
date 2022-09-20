@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022/9/14
  */
 @Configuration
-public class Properties {
+public class PresenceProperties {
     @Value("${presence.server.port}")
     private Integer presencePort;
     @Value("${server.port}")

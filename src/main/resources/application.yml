@@ -1,10 +1,13 @@
 server:
-  port: 8081
+  port: 8088
 
 chat:
   server:
-    host: 127.0.0.1
     port: 8000
+
+presence:
+  server:
+    port: 8001
 
 spring:
   application:

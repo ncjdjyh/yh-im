@@ -3,6 +3,8 @@ package com.neo.im.presence;
 import cn.hutool.core.util.ObjectUtil;
 import com.neo.im.common.Constant;
 import com.neo.im.common.HostAddress;
+import com.neo.im.presence.entity.command.LoginCommand;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,11 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2022/9/4
  */
 @Service(value = "memoryClientStateService")
+@Slf4j
 public class MemoryClientStateServiceImpl implements IClientStateService {
     private final Map<Long, UserState> table = new ConcurrentHashMap<>();
 
     @Override
-    public void activeState(Long id, HostAddress hostAddress) {
+    public void activeState(LoginCommand command) {
+        Long id = command.getId();
+        HostAddress hostAddress = command.getHostAddress();
+
+        log.info("client login:{}", id);
         if (ObjectUtil.isNotNull(id)) {
             if (table.containsKey(id)) {
                 activeState(id);

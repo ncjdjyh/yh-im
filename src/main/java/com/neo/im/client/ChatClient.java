@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.neo.im.client.config.ClientInfo;
 import com.neo.im.common.*;
+import com.neo.im.common.exception.BizException;
 import com.neo.im.common.payload.Message;
 import com.neo.im.common.tranform.MessageDecoder;
 import com.neo.im.common.tranform.MessageEncoder;
@@ -62,11 +63,11 @@ public class ChatClient {
         f.channel().closeFuture().addListener(future -> group.shutdownGracefully());
     }
 
-    public void sendMessage(String content, int type, Long from, Long to) {
+    public void sendMessage(String content, String type, Long from, Long to) {
         sendMessage(new Message(from, to, content), type);
     }
 
-    public void sendMessage(Message message, int type) {
+    public void sendMessage(Message message, String type) {
         String requestId = RequestId.next();
         MessageOutput output = new MessageOutput(requestId, type, message);
         messageCollector.send(output);

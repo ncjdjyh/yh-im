@@ -7,11 +7,10 @@ import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import com.neo.im.chat.rpc.PresenceService;
 import com.neo.im.common.*;
+import com.neo.im.common.exception.BizException;
 import com.neo.im.common.payload.Message;
 import com.neo.im.common.tranform.MessageInput;
 import com.neo.im.common.tranform.MessageOutput;
-import com.neo.im.presence.IClientStateService;
-import com.neo.im.presence.PresenceServer;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -33,8 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageInput> {
     @Autowired
     private HostAddress chatServerHostAddress;
-    @Autowired
-    private PresenceService presenceService;
 
     private final Map<Long, ChannelHandlerContext> channelMap = new ConcurrentHashMap<>(16);
 
@@ -43,15 +40,15 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
         Message message = msg.getPayload(Message.class);
         if (message != null) {
             Long messageFrom = message.getMessageFrom();
-            if (msg.getType() == Constant.Command.LOGIN) {
+            if (msg.getType().equals(Constant.Command.LOGIN)) {
                 channelMap.put(messageFrom, ctx);
-                presenceService.login(messageFrom, chatServerHostAddress);
+                PresenceService.login(messageFrom, chatServerHostAddress);
             }
-            if (msg.getType() == Constant.Command.LOGOUT) {
+            if (msg.getType().equals(Constant.Command.LOGOUT)) {
                 channelMap.remove(messageFrom);
-                presenceService.logout(messageFrom);
+                PresenceService.logout(messageFrom);
             }
-            if (msg.getType() == Constant.Command.MESSAGE) {
+            if (msg.getType().equals(Constant.Command.MESSAGE)) {
                 sendMessage(message);
             }
             log.info("channel read message... type:{} content:{}", msg.getType(), message.getContent());
@@ -67,7 +64,7 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
 
     private void sendMessage(Message message) {
         Long messageTo = message.getMessageTo();
-        HostAddress toAddress = presenceService.getConnectedServer(messageTo);
+        HostAddress toAddress = PresenceService.getConnectedServer(messageTo);
         if (ObjectUtil.isNull(toAddress)) {
             channelMap.remove(messageTo);
             log.info("{}:当前用户不在线", messageTo);
@@ -84,9 +81,11 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
     }
 
     public void sendMessageToChannel(Message message) {
-        ChannelHandlerContext context = channelMap.get(message.getMessageTo());
+        Long messageTo = message.getMessageTo();
+        ChannelHandlerContext context = channelMap.get(messageTo);
         if (ObjectUtil.isNull(context)) {
-            throw new BizException("找不到可用连接: " + message);
+            PresenceService.logout(messageTo);
+            throw new BizException("找不到可用连接: " + messageTo);
         }
         context.channel().eventLoop().execute(() -> {
             context.writeAndFlush(new MessageOutput(message.getMessageId(), Constant.Command.MESSAGE, message));

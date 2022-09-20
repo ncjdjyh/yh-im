@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api")
-public class ApiServer {
+public class ChatApiServer {
     @Autowired
     private ChatServer chatServer;
 

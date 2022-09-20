@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022/9/14
  */
 @Configuration
-public class Properties {
+public class ChatProperties {
     @Value("${chat.server.port}")
     private Integer chatPort;
     @Value("${server.port}")

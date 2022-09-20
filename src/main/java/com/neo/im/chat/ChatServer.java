@@ -1,5 +1,6 @@
 package com.neo.im.chat;
 
+import com.alibaba.nacos.api.naming.NamingService;
 import com.neo.im.common.*;
 import com.neo.im.common.payload.Message;
 import com.neo.im.common.tranform.MessageDecoder;
@@ -53,6 +54,7 @@ public class ChatServer {
         ChannelFuture f = bootstrap.bind(ip, port).syncUninterruptibly();
         if (f.isSuccess()) {
             RegisterCenter.register(chatServerHostAddress.getIp(), chatServerHostAddress.getChatPort(), Constant.ServiceName.CHAT_SERVICE);
+            RegisterCenter.register(chatServerHostAddress.getIp(), chatServerHostAddress.getApiPort(), Constant.ServiceName.CHAT_API_SERVICE);
             log.info("service at " + ip + ":" + port);
         }
         f.channel().closeFuture().addListener(future -> {

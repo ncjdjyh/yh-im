@@ -1,5 +1,8 @@
 package com.neo.im.client;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.neo.im.client.config.ClientInfo;
 import com.neo.im.common.Constant;
@@ -32,14 +35,9 @@ public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
         this.context = ctx;
     }
 
-    public void sendHeartbeat(ChannelHandlerContext ctx, int type) {
-        log.info("send heartbeat to presence server...");
+    public void sendHeartbeat(ChannelHandlerContext ctx, String type) {
+        log.debug("send heartbeat to presence server...:{}", DateUtil.now());
         ctx.channel().writeAndFlush(new MessageOutput(type, new Heartbeat(clientInfo.getClientId(), "ping")));
-    }
-
-    public void sendLoginHeartbeat(HostAddress hostAddress) {
-        log.info("send heartbeat to presence server...");
-        this.context.channel().writeAndFlush(new MessageOutput(Constant.Command.LOGIN, new Heartbeat(clientInfo.getClientId(), JSONUtil.toJsonStr(hostAddress))));
     }
 
     @Override

@@ -44,9 +44,9 @@ public class PresenceServer {
                     @Override
                     protected void initChannel(io.netty.channel.socket.SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
-                        p.addLast(new IdleStateHandler(0, 0, 30));
+                        p.addLast(new IdleStateHandler(0, 0, 15));
                         p.addLast(new MessageDecoder());
-                        p.addLast(heartbeatReceiver);
+                        p.addLast(new HeartbeatReceiver());
                     }
                 });
         ChannelFuture f = bootstrap.bind(hostAddress.getIp(), hostAddress.getChatPort()).syncUninterruptibly();

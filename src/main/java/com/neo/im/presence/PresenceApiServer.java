@@ -1,19 +1,18 @@
 package com.neo.im.presence;
 
 import com.neo.im.common.HostAddress;
+import com.neo.im.presence.entity.command.LoginCommand;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author ncjdjyh
  * @since 2022/9/18
  */
 @RestController
-public class ApiServer {
+public class PresenceApiServer {
     @Autowired
     IClientStateService userStateService;
 
@@ -24,8 +23,14 @@ public class ApiServer {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam Long id, @RequestParam HostAddress hostAddress) {
-        userStateService.activeState(id, hostAddress);
+    public ResponseEntity<?> login(@RequestBody LoginCommand command) {
+        userStateService.activeState(command);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestParam Long id) {
+        userStateService.inActiveState(id);
         return ResponseEntity.ok().build();
     }
 }

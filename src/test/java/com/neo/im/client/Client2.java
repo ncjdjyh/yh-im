@@ -1,5 +1,7 @@
 package com.neo.im.client;
 
+import com.neo.im.common.Constant;
+
 import java.util.Scanner;
 
 /**
@@ -13,7 +15,7 @@ public class Client2 {
         while (true) {
             System.out.println("请输入消息..");
             String message = scanner.nextLine();
-            client2.sendMessage(message, 2L, 1L);
+            client2.sendMessage(message, Constant.Command.MESSAGE, 2L, 1L);
         }
     }
 }

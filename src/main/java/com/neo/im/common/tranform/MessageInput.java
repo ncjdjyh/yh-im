@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MessageInput {
     private String requestId;
-    private Integer type;
+    private String type;
     private String payload;
 
     public <T> T getPayload(Class<T> clazz) {

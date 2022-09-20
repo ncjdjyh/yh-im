@@ -6,9 +6,9 @@ package com.neo.im.common;
  */
 public class Constant {
     public interface Command {
-        int LOGIN = 1;
-        int MESSAGE = 2;
-        int LOGOUT = 0;
+        String LOGIN = "login";
+        String LOGOUT = "logout";
+        String MESSAGE = "message";
     }
 
     public interface PresenceState {
