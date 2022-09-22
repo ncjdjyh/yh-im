@@ -2,14 +2,16 @@ package com.neo.im.client;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.nacos.api.naming.pojo.Instance;
-import com.neo.im.client.config.ClientInfo;
-import com.neo.im.common.*;
+import com.neo.im.client.config.ClientChatInfo;
+import com.neo.im.common.Constant;
+import com.neo.im.common.HostAddress;
+import com.neo.im.common.RegisterCenter;
 import com.neo.im.common.exception.BizException;
+import com.neo.im.common.payload.Heartbeat;
 import com.neo.im.common.payload.Message;
 import com.neo.im.common.tranform.MessageDecoder;
 import com.neo.im.common.tranform.MessageEncoder;
 import com.neo.im.common.tranform.MessageOutput;
-import com.neo.im.util.RequestId;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -26,19 +28,35 @@ public class ChatClient {
     private EventLoopGroup group;
     private ClientMessageCollector messageCollector = new ClientMessageCollector();
     private HeartbeatSender heartbeatSender = new HeartbeatSender();
-    private ClientInfo clientInfo = ClientInfo.getInstance();
+    private ClientChatInfo clientChatInfo;
 
-    public ChatClient() {
-        connectChatServer();
-        connectPresenceServer();
+    public ChatClient(Long clientId) {
+        clientChatInfo = ClientChatInfo.getInstance(clientId);
+        connectChatServer(clientChatInfo.getChatHostAddress());
+        connectPresenceServer(clientChatInfo.getPresenceHostAddress());
         loginChatServer();
+        loginPresenceServer();
+    }
+
+    private void loginPresenceServer() {
+        Heartbeat heartbeat = new Heartbeat(clientChatInfo.getClientId(), clientChatInfo.getChatHostAddress());
+        MessageOutput output = new MessageOutput(Constant.Command.LOGIN, heartbeat);
+        heartbeatSender.send(output);
     }
 
     private void loginChatServer() {
-        sendMessage("login", Constant.Command.LOGIN, clientInfo.getClientId(), -1L);
+        Message message = new Message(clientChatInfo.getClientId(), -1L, "hello");
+        MessageOutput messageOutput = new MessageOutput(Constant.Command.LOGIN, message);
+        messageCollector.send(messageOutput);
     }
 
-    private void connectPresenceServer() {
+
+    public void sendMessage(Message message) {
+        MessageOutput output = new MessageOutput(Constant.Command.MESSAGE, message);
+        messageCollector.send(output);
+    }
+
+    private void connectPresenceServer(HostAddress presenceHostAddress) {
         Instance instance = RegisterCenter.getOneHealthyInstance(Constant.ServiceName.PRESENCE_SERVICE);
         if (ObjectUtil.isNull(instance)) {
             throw new BizException("no available service");
@@ -59,21 +77,11 @@ public class ChatClient {
 
         });
         bootstrap.option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.SO_KEEPALIVE, true);
-        ChannelFuture f = bootstrap.connect(instance.getIp(), instance.getPort()).syncUninterruptibly();
+        ChannelFuture f = bootstrap.connect(presenceHostAddress.getIp(), presenceHostAddress.getChatPort()).syncUninterruptibly();
         f.channel().closeFuture().addListener(future -> group.shutdownGracefully());
     }
 
-    public void sendMessage(String content, String type, Long from, Long to) {
-        sendMessage(new Message(from, to, content), type);
-    }
-
-    public void sendMessage(Message message, String type) {
-        String requestId = RequestId.next();
-        MessageOutput output = new MessageOutput(requestId, type, message);
-        messageCollector.send(output);
-    }
-
-    private void connectChatServer() {
+    private void connectChatServer(HostAddress chatHostAddress) {
         Instance instance = RegisterCenter.getOneHealthyInstance(Constant.ServiceName.CHAT_SERVICE);
         if (ObjectUtil.isNull(instance)) {
             throw new BizException("no available service");
@@ -93,8 +101,12 @@ public class ChatClient {
 
         });
         bootstrap.option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.SO_KEEPALIVE, true);
-        ChannelFuture f = bootstrap.connect(instance.getIp(), instance.getPort()).syncUninterruptibly();
+        ChannelFuture f = bootstrap.connect(chatHostAddress.getIp(), chatHostAddress.getChatPort()).syncUninterruptibly();
         f.channel().closeFuture().addListener(future -> closeChatServer());
+    }
+
+    public ClientChatInfo getClientChatInfo() {
+        return clientChatInfo;
     }
 
     public void closeChatServer() {

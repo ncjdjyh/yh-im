@@ -18,7 +18,6 @@ public class PresenceServiceTest {
 
     @Test
     public void getConnectedServer() {
-        PresenceService.login(1L, null);
     }
 
     @Test

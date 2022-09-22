@@ -18,8 +18,8 @@ public class Constant {
 
     public interface ServiceName {
         String CHAT_SERVICE = "CHAT_SERVICE";
-        String PRESENCE_SERVICE = "PRESENCE_SERVICE";
         String CHAT_API_SERVICE = "CHAT_API_SERVICE";
+        String PRESENCE_SERVICE = "PRESENCE_SERVICE";
         String PRESENCE_API_SERVICE = "PRESENCE_API_SERVICE";
     }
 }

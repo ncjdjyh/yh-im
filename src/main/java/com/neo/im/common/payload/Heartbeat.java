@@ -10,6 +10,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Heartbeat {
-   private Long id;
-   private String content;
+   private Long clientId;
+   private Object content;
 }

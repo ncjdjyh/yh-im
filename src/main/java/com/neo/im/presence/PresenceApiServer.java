@@ -23,8 +23,8 @@ public class PresenceApiServer {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginCommand command) {
-        userStateService.activeState(command);
+    public ResponseEntity<?> login(Long id) {
+        userStateService.activeState(id);
         return ResponseEntity.ok().build();
     }
 

@@ -8,13 +8,11 @@ import com.neo.im.presence.entity.command.LoginCommand;
  * @since 2022/9/4
  */
 public interface IClientStateService {
-    void activeState(LoginCommand command);
-
-    void activeState(Long id);
+    boolean activeState(Long id);
 
     HostAddress getConnectedServer(Long id);
 
-    void inActiveState(Long id);
+    boolean inActiveState(Long id);
 
     UserState getState(Long id);
 }

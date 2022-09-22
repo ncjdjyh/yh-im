@@ -46,7 +46,7 @@ public class PresenceServer {
                         ChannelPipeline p = ch.pipeline();
                         p.addLast(new IdleStateHandler(0, 0, 15));
                         p.addLast(new MessageDecoder());
-                        p.addLast(new HeartbeatReceiver());
+                        p.addLast(heartbeatReceiver);
                     }
                 });
         ChannelFuture f = bootstrap.bind(hostAddress.getIp(), hostAddress.getChatPort()).syncUninterruptibly();

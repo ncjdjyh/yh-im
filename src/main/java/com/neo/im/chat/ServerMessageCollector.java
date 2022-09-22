@@ -11,15 +11,13 @@ import com.neo.im.common.exception.BizException;
 import com.neo.im.common.payload.Message;
 import com.neo.im.common.tranform.MessageInput;
 import com.neo.im.common.tranform.MessageOutput;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author neo
@@ -33,7 +31,7 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
     @Autowired
     private HostAddress chatServerHostAddress;
 
-    private final Map<Long, ChannelHandlerContext> channelMap = new ConcurrentHashMap<>(16);
+    private final ChannelContextHolder channelHolder = new ChannelContextHolder();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MessageInput msg) {
@@ -41,12 +39,10 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
         if (message != null) {
             Long messageFrom = message.getMessageFrom();
             if (msg.getType().equals(Constant.Command.LOGIN)) {
-                channelMap.put(messageFrom, ctx);
-                PresenceService.login(messageFrom, chatServerHostAddress);
+                channelHolder.put(messageFrom, ctx);
             }
             if (msg.getType().equals(Constant.Command.LOGOUT)) {
-                channelMap.remove(messageFrom);
-                PresenceService.logout(messageFrom);
+                channelHolder.remove(ctx);
             }
             if (msg.getType().equals(Constant.Command.MESSAGE)) {
                 sendMessage(message);
@@ -66,12 +62,12 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
         Long messageTo = message.getMessageTo();
         HostAddress toAddress = PresenceService.getConnectedServer(messageTo);
         if (ObjectUtil.isNull(toAddress)) {
-            channelMap.remove(messageTo);
+            channelHolder.remove(messageTo);
             log.info("{}:当前用户不在线", messageTo);
             return;
         }
 
-        boolean connectToCurrentServer = toAddress.sameHostAddress(chatServerHostAddress);
+        boolean connectToCurrentServer = toAddress.sameChatHostAddress(chatServerHostAddress);
         if (connectToCurrentServer) {
             sendMessageToChannel(message);
         } else {
@@ -82,25 +78,20 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
 
     public void sendMessageToChannel(Message message) {
         Long messageTo = message.getMessageTo();
-        ChannelHandlerContext context = channelMap.get(messageTo);
-        if (ObjectUtil.isNull(context)) {
+        Channel channel = channelHolder.get(messageTo);
+        if (ObjectUtil.isNull(channel)) {
             PresenceService.logout(messageTo);
             throw new BizException("找不到可用连接: " + messageTo);
         }
-        context.channel().eventLoop().execute(() -> {
-            context.writeAndFlush(new MessageOutput(message.getMessageId(), Constant.Command.MESSAGE, message));
+        channel.eventLoop().execute(() -> {
+            channel.writeAndFlush(new MessageOutput(message.getMessageId(), Constant.Command.MESSAGE, message));
         });
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         log.warn("channelInactive:{}", ctx.name());
-        channelMap.forEach((k, v) -> {
-            if (v == ctx) {
-                log.info("remove client connection..id:{}", k);
-                channelMap.remove(k);
-            }
-        });
+        channelHolder.remove(ctx);
         super.channelInactive(ctx);
     }
 }

@@ -49,4 +49,16 @@ public class RegisterCenter {
             throw new BizException("get service instance exception!", e);
         }
     }
+
+    public static HostAddress getChatHostAddress() {
+        Instance apiService = getOneHealthyInstance(Constant.ServiceName.CHAT_API_SERVICE);
+        Instance chatService = getOneHealthyInstance(Constant.ServiceName.CHAT_SERVICE);
+        return new HostAddress(apiService.getIp(), apiService.getPort(), chatService.getPort());
+    }
+
+    public static HostAddress getPresenceHostAddress() {
+        Instance apiService = getOneHealthyInstance(Constant.ServiceName.PRESENCE_API_SERVICE);
+        Instance chatService = getOneHealthyInstance(Constant.ServiceName.PRESENCE_SERVICE);
+        return new HostAddress(apiService.getIp(), apiService.getPort(), chatService.getPort());
+    }
 }

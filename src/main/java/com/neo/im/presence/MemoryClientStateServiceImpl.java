@@ -20,28 +20,15 @@ public class MemoryClientStateServiceImpl implements IClientStateService {
     private final Map<Long, UserState> table = new ConcurrentHashMap<>();
 
     @Override
-    public void activeState(LoginCommand command) {
-        Long id = command.getId();
-        HostAddress hostAddress = command.getHostAddress();
-
-        log.info("client login:{}", id);
-        if (ObjectUtil.isNotNull(id)) {
-            if (table.containsKey(id)) {
-                activeState(id);
-            } else {
-                table.put(id, new UserState(Constant.PresenceState.ONLINE, hostAddress));
-            }
-        }
-    }
-
-    @Override
-    public void activeState(Long id) {
+    public boolean activeState(Long id) {
         if (ObjectUtil.isNotNull(id)) {
             if (table.containsKey(id)) {
                 UserState userState = table.get(id);
                 userState.setState(Constant.PresenceState.ONLINE);
+                return true;
             }
         }
+        return false;
     }
 
     @Override
@@ -54,13 +41,15 @@ public class MemoryClientStateServiceImpl implements IClientStateService {
     }
 
     @Override
-    public void inActiveState(Long clientId) {
+    public boolean inActiveState(Long clientId) {
         if (ObjectUtil.isNotNull(clientId)) {
             UserState userState = table.get(clientId);
             if (ObjectUtil.isNotNull(userState)) {
                 userState.setState(Constant.PresenceState.OFFLINE);
+                return true;
             }
         }
+        return false;
     }
 
     @Override

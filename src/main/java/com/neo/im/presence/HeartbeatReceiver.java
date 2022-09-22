@@ -1,9 +1,8 @@
 package com.neo.im.presence;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONUtil;
+import com.neo.im.common.ChannelContextHolder;
 import com.neo.im.common.Constant;
-import com.neo.im.common.HostAddress;
 import com.neo.im.common.payload.Heartbeat;
 import com.neo.im.common.tranform.MessageInput;
 import io.netty.channel.ChannelHandler;
@@ -24,9 +23,9 @@ import org.springframework.stereotype.Service;
 @ChannelHandler.Sharable
 public class HeartbeatReceiver extends SimpleChannelInboundHandler<MessageInput> {
     @Autowired
-    IClientStateService userStateService;
+    private IClientStateService clientStateService;
 
-    ChannelContextHolder holder = new ChannelContextHolder();
+    private final ChannelContextHolder holder = new ChannelContextHolder();
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
@@ -34,11 +33,10 @@ public class HeartbeatReceiver extends SimpleChannelInboundHandler<MessageInput>
 
         if (event.state() == IdleState.ALL_IDLE) {
             log.info("trigger all idle event... context name:{}", ctx.name());
-            // TODO 计数, 关闭
-            Long id = holder.remove(ctx.channel());
-            if (ObjectUtil.isNotNull(id)) {
-                ctx.close();
-                userStateService.inActiveState(id);
+            Long id = holder.peekClient(ctx);
+            if (ObjectUtil.isNotNull(id) && clientStateService.inActiveState(id)) {
+                // 保证客户端状态已下线, 再关闭连接
+                holder.remove(ctx);
             }
         }
     }
@@ -48,6 +46,11 @@ public class HeartbeatReceiver extends SimpleChannelInboundHandler<MessageInput>
         if (ObjectUtil.isNotNull(msg)) {
             Heartbeat heartBeat = msg.getPayload(Heartbeat.class);
             log.debug("receive heartbeat.. content:{}", heartBeat.getContent());
+            if (msg.getType().equals(Constant.Command.LOGIN)) {
+                Long clientId = heartBeat.getClientId();
+                clientStateService.activeState(clientId);
+                holder.put(clientId, ctx);
+            }
         }
     }
 
@@ -58,12 +61,7 @@ public class HeartbeatReceiver extends SimpleChannelInboundHandler<MessageInput>
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        holder.remove(ctx);
         super.channelInactive(ctx);
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        holder.remove(ctx.channel());
-        super.channelActive(ctx);
     }
 }

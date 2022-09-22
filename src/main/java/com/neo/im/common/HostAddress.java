@@ -18,7 +18,7 @@ public class HostAddress implements Serializable {
     private Integer apiPort;
     private Integer chatPort;
 
-    public boolean sameHostAddress(HostAddress hostAddress) {
+    public boolean sameChatHostAddress(HostAddress hostAddress) {
         return ObjectUtil.isNotNull(hostAddress)
                 && hostAddress.getIp().equals(getIp())
                 && hostAddress.getChatPort().equals(getChatPort());
@@ -26,5 +26,14 @@ public class HostAddress implements Serializable {
 
     public String getUrl() {
         return String.format("%s:%s", getIp(), getApiPort());
+    }
+
+    @Override
+    public String toString() {
+        return "HostAddress{" +
+                "ip='" + ip + '\'' +
+                ", apiPort=" + apiPort +
+                ", chatPort=" + chatPort +
+                '}';
     }
 }

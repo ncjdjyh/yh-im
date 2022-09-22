@@ -1,12 +1,8 @@
 package com.neo.im.client;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.json.JSONUtil;
-import com.neo.im.client.config.ClientInfo;
+import com.neo.im.client.config.ClientChatInfo;
 import com.neo.im.common.Constant;
-import com.neo.im.common.HostAddress;
 import com.neo.im.common.payload.Heartbeat;
 import com.neo.im.common.tranform.MessageInput;
 import com.neo.im.common.tranform.MessageOutput;
@@ -23,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
     private ChannelHandlerContext context;
-    ClientInfo clientInfo = ClientInfo.getInstance();
+    ClientChatInfo clientChatInfo = ClientChatInfo.getInstance(clientId);
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, MessageInput messageInput) throws Exception {
@@ -35,9 +31,9 @@ public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
         this.context = ctx;
     }
 
-    public void sendHeartbeat(ChannelHandlerContext ctx, String type) {
+    private void sendHeartbeat(ChannelHandlerContext ctx, MessageOutput messageOutput) {
         log.debug("send heartbeat to presence server...:{}", DateUtil.now());
-        ctx.channel().writeAndFlush(new MessageOutput(type, new Heartbeat(clientInfo.getClientId(), "ping")));
+        ctx.channel().writeAndFlush(messageOutput);
     }
 
     @Override
@@ -46,7 +42,11 @@ public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
 
         if (event.state() == IdleState.ALL_IDLE) {
             log.info("trigger all idle event... context name:{}", ctx.name());
-            sendHeartbeat(this.context, Constant.Command.MESSAGE);
+            sendHeartbeat(ctx, new MessageOutput(Constant.Command.MESSAGE, new Heartbeat(clientChatInfo.getClientId(), "ping")));
         }
+    }
+
+    public void send(MessageOutput output) {
+        sendHeartbeat(this.context, output);
     }
 }

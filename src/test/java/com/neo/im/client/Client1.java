@@ -1,6 +1,7 @@
 package com.neo.im.client;
 
 import com.neo.im.common.Constant;
+import com.neo.im.common.payload.Message;
 
 import java.util.*;
 
@@ -10,14 +11,14 @@ import java.util.*;
  */
 public class Client1 {
     public static void main(String[] args) {
-        ChatClient client1 = new ChatClient();
+        ChatClient client1 = new ChatClient(1L);
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
             System.out.println("请输入消息..");
-            String message = scanner.nextLine();
-            System.out.println(message);
-            client1.sendMessage(message, Constant.Command.MESSAGE, 1L, 2L);
+            String content = scanner.nextLine();
+            System.out.println(content);
+            client1.sendMessage(new Message(client1.getClientChatInfo().getClientId(), 2L, content));
         }
     }
 }
