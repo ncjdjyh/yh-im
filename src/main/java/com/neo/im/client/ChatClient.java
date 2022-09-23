@@ -1,12 +1,14 @@
 package com.neo.im.client;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.neo.im.client.config.ClientChatInfo;
 import com.neo.im.common.Constant;
 import com.neo.im.common.HostAddress;
 import com.neo.im.common.RegisterCenter;
 import com.neo.im.common.exception.BizException;
+import com.neo.im.common.payload.GroupMessage;
 import com.neo.im.common.payload.Heartbeat;
 import com.neo.im.common.payload.Message;
 import com.neo.im.common.tranform.MessageDecoder;
@@ -31,7 +33,8 @@ public class ChatClient {
     private ClientChatInfo clientChatInfo;
 
     public ChatClient(Long clientId) {
-        clientChatInfo = ClientChatInfo.getInstance(clientId);
+        clientChatInfo = ClientChatInfo.getInstance();
+        clientChatInfo.setClientId(clientId);
         connectChatServer(clientChatInfo.getChatHostAddress());
         connectPresenceServer(clientChatInfo.getPresenceHostAddress());
         loginChatServer();
@@ -39,20 +42,25 @@ public class ChatClient {
     }
 
     private void loginPresenceServer() {
-        Heartbeat heartbeat = new Heartbeat(clientChatInfo.getClientId(), clientChatInfo.getChatHostAddress());
-        MessageOutput output = new MessageOutput(Constant.Command.LOGIN, heartbeat);
+        Heartbeat heartbeat = new Heartbeat(clientChatInfo.getClientId(), JSONUtil.toJsonStr(clientChatInfo.getChatHostAddress()));
+        MessageOutput output = new MessageOutput(Constant.MessageType.LOGIN, heartbeat);
         heartbeatSender.send(output);
     }
 
     private void loginChatServer() {
-        Message message = new Message(clientChatInfo.getClientId(), -1L, "hello");
-        MessageOutput messageOutput = new MessageOutput(Constant.Command.LOGIN, message);
+        Heartbeat heartbeat = new Heartbeat(clientChatInfo.getClientId(), "login");
+        MessageOutput messageOutput = new MessageOutput(Constant.MessageType.LOGIN, heartbeat);
         messageCollector.send(messageOutput);
     }
 
 
     public void sendMessage(Message message) {
-        MessageOutput output = new MessageOutput(Constant.Command.MESSAGE, message);
+        MessageOutput output = new MessageOutput(Constant.MessageType.CHAT, message);
+        messageCollector.send(output);
+    }
+
+    public void sendMessage(GroupMessage message) {
+        MessageOutput output = new MessageOutput(Constant.MessageType.GROUP_CHAT, message);
         messageCollector.send(output);
     }
 

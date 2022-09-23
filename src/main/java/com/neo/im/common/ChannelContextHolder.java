@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
  * @since 2022/9/18
  */
 @Slf4j
+@Component
 public class ChannelContextHolder {
     private final Map<Long, Channel> holder = new ConcurrentHashMap<>(16);
 

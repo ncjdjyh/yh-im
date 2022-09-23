@@ -5,10 +5,12 @@ package com.neo.im.common;
  * @since 2022/8/28
  */
 public class Constant {
-    public interface Command {
+    public interface MessageType {
         String LOGIN = "login";
         String LOGOUT = "logout";
-        String MESSAGE = "message";
+        String CHAT = "singleChat";
+        String GROUP_CHAT = "groupChat";
+        String HEARTBEAT = "heartbeat";
     }
 
     public interface PresenceState {

@@ -1,6 +1,5 @@
 package com.neo.im.client;
 
-import cn.hutool.core.date.DateUtil;
 import com.neo.im.client.config.ClientChatInfo;
 import com.neo.im.common.Constant;
 import com.neo.im.common.payload.Heartbeat;
@@ -19,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
     private ChannelHandlerContext context;
-    ClientChatInfo clientChatInfo = ClientChatInfo.getInstance(clientId);
+    ClientChatInfo clientChatInfo = ClientChatInfo.getInstance();
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, MessageInput messageInput) throws Exception {
@@ -32,7 +31,7 @@ public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
     }
 
     private void sendHeartbeat(ChannelHandlerContext ctx, MessageOutput messageOutput) {
-        log.debug("send heartbeat to presence server...:{}", DateUtil.now());
+//        log.debug("send heartbeat to presence server...:{}", DateUtil.now());
         ctx.channel().writeAndFlush(messageOutput);
     }
 
@@ -41,8 +40,7 @@ public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
         IdleStateEvent event = (IdleStateEvent) evt;
 
         if (event.state() == IdleState.ALL_IDLE) {
-            log.info("trigger all idle event... context name:{}", ctx.name());
-            sendHeartbeat(ctx, new MessageOutput(Constant.Command.MESSAGE, new Heartbeat(clientChatInfo.getClientId(), "ping")));
+            sendHeartbeat(ctx, new MessageOutput(Constant.MessageType.HEARTBEAT, new Heartbeat(clientChatInfo.getClientId(), "ping")));
         }
     }
 

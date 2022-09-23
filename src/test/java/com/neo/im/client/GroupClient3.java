@@ -1,23 +1,23 @@
 package com.neo.im.client;
 
-import com.neo.im.common.payload.Message;
+import com.neo.im.common.payload.GroupMessage;
 
 import java.util.Scanner;
 
 /**
- * @author: ncjdjyh
- * @since: 2022/8/28
+ * @author ncjdjyh
+ * @since 2022/9/23
  */
-public class Client1 {
+public class GroupClient3 {
     public static void main(String[] args) {
-        ChatClient client1 = new ChatClient(1L);
+        ChatClient client1 = new ChatClient(3L);
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
             System.out.println("请输入消息..");
             String content = scanner.nextLine();
             System.out.println(content);
-            client1.sendMessage(new Message(client1.getClientChatInfo().getClientId(), 2L, content));
+            client1.sendMessage(new GroupMessage(client1.getClientChatInfo().getClientId(),content, 1L));
         }
     }
 }

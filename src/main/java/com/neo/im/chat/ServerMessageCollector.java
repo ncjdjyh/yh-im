@@ -1,5 +1,6 @@
 package com.neo.im.chat;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
@@ -8,6 +9,8 @@ import cn.hutool.json.JSONUtil;
 import com.neo.im.chat.rpc.PresenceService;
 import com.neo.im.common.*;
 import com.neo.im.common.exception.BizException;
+import com.neo.im.common.payload.GroupMessage;
+import com.neo.im.common.payload.Heartbeat;
 import com.neo.im.common.payload.Message;
 import com.neo.im.common.tranform.MessageInput;
 import com.neo.im.common.tranform.MessageOutput;
@@ -18,6 +21,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @Author neo
@@ -30,27 +35,60 @@ import org.springframework.stereotype.Service;
 public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageInput> {
     @Autowired
     private HostAddress chatServerHostAddress;
-
-    private final ChannelContextHolder channelHolder = new ChannelContextHolder();
+    @Autowired
+    private ChannelContextHolder channelHolder;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MessageInput msg) {
-        Message message = msg.getPayload(Message.class);
-        if (message != null) {
-            Long messageFrom = message.getMessageFrom();
-            if (msg.getType().equals(Constant.Command.LOGIN)) {
-                channelHolder.put(messageFrom, ctx);
-            }
-            if (msg.getType().equals(Constant.Command.LOGOUT)) {
-                channelHolder.remove(ctx);
-            }
-            if (msg.getType().equals(Constant.Command.MESSAGE)) {
-                sendMessage(message);
-            }
-            log.info("channel read message... type:{} content:{}", msg.getType(), message.getContent());
-            return;
+        if (msg.getType().equals(Constant.MessageType.LOGIN)) {
+            Heartbeat heartbeat = msg.getPayload(Heartbeat.class);
+            channelHolder.put(heartbeat.getUserId(), ctx);
         }
-        log.info("message is empty!");
+        if (msg.getType().equals(Constant.MessageType.CHAT)) {
+            Message message = msg.getPayload(Message.class);
+            sendMessage(message);
+        }
+        if (msg.getType().equals(Constant.MessageType.GROUP_CHAT)) {
+            GroupMessage message = msg.getPayload(GroupMessage.class);
+            sendMessageGroupMessage(message);
+        }
+        log.info("channel read message... type:{}", msg.getType());
+    }
+
+    private void sendMessageGroupMessage(GroupMessage message) {
+        List<Long> users = findUsersByChannel(message.getChannelId());
+        if (CollUtil.isNotEmpty(users)) {
+            for (Long userId : users) {
+                HostAddress toAddress = PresenceService.getConnectedServer(userId);
+                if (ObjectUtil.isNull(toAddress)) {
+                    channelHolder.remove(userId);
+                    log.info("{}:当前用户不在线", userId);
+                    return;
+                }
+                boolean connectToCurrentServer = toAddress.sameChatHostAddress(chatServerHostAddress);
+                if (connectToCurrentServer) {
+                    sendGroupMessageToChannel(userId, message);
+                } else {
+                    String params = JSONUtil.toJsonStr(message, JSONConfig.create().setDateFormat(DatePattern.NORM_DATETIME_PATTERN));
+                    HttpUtil.post(toAddress.getUrl() + "/api/sendGroupMessage", params);
+                }
+            }
+        }
+    }
+
+    public void sendGroupMessageToChannel(Long messageTo, GroupMessage message) {
+        Channel channel = channelHolder.get(messageTo);
+        if (ObjectUtil.isNull(channel)) {
+            PresenceService.logout(messageTo);
+            throw new BizException("找不到可用连接: " + messageTo);
+        }
+        channel.eventLoop().execute(() -> {
+            channel.writeAndFlush(new MessageOutput(message.getMessageId(), Constant.MessageType.GROUP_CHAT, message));
+        });
+    }
+
+    private List<Long> findUsersByChannel(Long channelId) {
+        return CollUtil.newArrayList(1L, 2L, 3L);
     }
 
     @Override
@@ -84,7 +122,7 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
             throw new BizException("找不到可用连接: " + messageTo);
         }
         channel.eventLoop().execute(() -> {
-            channel.writeAndFlush(new MessageOutput(message.getMessageId(), Constant.Command.MESSAGE, message));
+            channel.writeAndFlush(new MessageOutput(message.getMessageId(), Constant.MessageType.CHAT, message));
         });
     }
 

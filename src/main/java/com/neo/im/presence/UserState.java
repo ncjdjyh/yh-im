@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
  */
 @Data
 public class UserState {
-    public UserState() {
-    }
-
     public UserState(Integer state, HostAddress connectedServer) {
         this.state = state;
         this.connectedServer = connectedServer;

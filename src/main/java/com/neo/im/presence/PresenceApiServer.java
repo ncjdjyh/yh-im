@@ -1,8 +1,6 @@
 package com.neo.im.presence;
 
 import com.neo.im.common.HostAddress;
-import com.neo.im.presence.entity.command.LoginCommand;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class PresenceApiServer {
     @Autowired
-    IClientStateService userStateService;
+    IUserStateService userStateService;
 
     @GetMapping("/getUserConnectHostAddress")
     public ResponseEntity<HostAddress> getUserConnectHostAddress(@RequestParam Long id) {
@@ -24,13 +22,13 @@ public class PresenceApiServer {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(Long id) {
-        userStateService.activeState(id);
+        userStateService.login(id);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestParam Long id) {
-        userStateService.inActiveState(id);
+        userStateService.logout(id);
         return ResponseEntity.ok().build();
     }
 }

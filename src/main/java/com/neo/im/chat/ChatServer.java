@@ -1,7 +1,9 @@
 package com.neo.im.chat;
 
-import com.alibaba.nacos.api.naming.NamingService;
-import com.neo.im.common.*;
+import com.neo.im.common.Constant;
+import com.neo.im.common.HostAddress;
+import com.neo.im.common.RegisterCenter;
+import com.neo.im.common.payload.GroupMessage;
 import com.neo.im.common.payload.Message;
 import com.neo.im.common.tranform.MessageDecoder;
 import com.neo.im.common.tranform.MessageEncoder;
@@ -67,5 +69,9 @@ public class ChatServer {
 
     public void sendMessage(Message message) {
         collector.sendMessageToChannel(message);
+    }
+
+    public void sendGroupMessage(GroupMessage message) {
+        collector.sendGroupMessageToChannel(message);
     }
 }

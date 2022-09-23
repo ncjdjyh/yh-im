@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.neo.im.common.HostAddress;
 import com.neo.im.common.RegisterCenter;
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * @author ncjdjyh
@@ -17,14 +18,12 @@ public class ClientChatInfo {
    private HostAddress chatHostAddress;
    private HostAddress presenceHostAddress;
 
-   public static synchronized ClientChatInfo getInstance(Long clientId) {
+   public static synchronized ClientChatInfo getInstance() {
       if (info == null) {
          ClientChatInfo clientChatInfo = new ClientChatInfo();
          clientChatInfo.setUsername(RandomUtil.randomString(8));
-         clientChatInfo.setClientId(clientId);
          clientChatInfo.setChatHostAddress(RegisterCenter.getChatHostAddress());
          clientChatInfo.setPresenceHostAddress(RegisterCenter.getPresenceHostAddress());
-
          return clientChatInfo;
       }
       return info;

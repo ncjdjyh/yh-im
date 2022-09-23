@@ -3,7 +3,6 @@ package com.neo.im.presence;
 import cn.hutool.core.util.ObjectUtil;
 import com.neo.im.common.Constant;
 import com.neo.im.common.HostAddress;
-import com.neo.im.presence.entity.command.LoginCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +15,31 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service(value = "memoryClientStateService")
 @Slf4j
-public class MemoryClientStateServiceImpl implements IClientStateService {
+public class MemoryUserStateServiceImpl implements IUserStateService {
     private final Map<Long, UserState> table = new ConcurrentHashMap<>();
 
     @Override
-    public boolean activeState(Long id) {
-        if (ObjectUtil.isNotNull(id)) {
-            if (table.containsKey(id)) {
-                UserState userState = table.get(id);
+    public boolean login(Long userId) {
+        if (ObjectUtil.isNotNull(userId)) {
+            if (table.containsKey(userId)) {
+                UserState userState = table.get(userId);
                 userState.setState(Constant.PresenceState.ONLINE);
                 return true;
             }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean login(Long clientId, HostAddress chatServer) {
+        if (ObjectUtil.isNotNull(clientId)) {
+            if (table.containsKey(clientId)) {
+                UserState userState = table.get(clientId);
+                userState.setState(Constant.PresenceState.ONLINE);
+            } else {
+               table.put(clientId, new UserState(Constant.PresenceState.ONLINE, chatServer));
+            }
+            return true;
         }
         return false;
     }
@@ -41,9 +54,9 @@ public class MemoryClientStateServiceImpl implements IClientStateService {
     }
 
     @Override
-    public boolean inActiveState(Long clientId) {
-        if (ObjectUtil.isNotNull(clientId)) {
-            UserState userState = table.get(clientId);
+    public boolean logout(Long userId) {
+        if (ObjectUtil.isNotNull(userId)) {
+            UserState userState = table.get(userId);
             if (ObjectUtil.isNotNull(userState)) {
                 userState.setState(Constant.PresenceState.OFFLINE);
                 return true;
@@ -52,8 +65,4 @@ public class MemoryClientStateServiceImpl implements IClientStateService {
         return false;
     }
 
-    @Override
-    public UserState getState(Long id) {
-        return table.get(id);
-    }
 }
