@@ -1,35 +1,24 @@
-package com.neo.im.common.payload;
+package com.neo.im.chat.entity;
 
 import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.neo.im.util.RequestId;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
 /**
  * @author ncjdjyh
- * @since 2022/9/23
+ * @since 2022/9/30
  */
 @Data
-@NoArgsConstructor
-public class GroupMessage {
+public class SendGroupMessageCommand {
     private String messageId;
     private Long userId;
     private String content;
     private Long channelId;
+    private Long messageTo;
     @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
     @JsonFormat(timezone = "GMT+8", pattern = DatePattern.NORM_DATETIME_PATTERN)
     private Date createTime;
-
-    public GroupMessage(Long userId, String content, Long channelId) {
-        this.messageId = RequestId.next();
-        this.userId = userId;
-        this.content = content;
-        this.channelId = channelId;
-        this.createTime = DateUtil.date();
-    }
 }

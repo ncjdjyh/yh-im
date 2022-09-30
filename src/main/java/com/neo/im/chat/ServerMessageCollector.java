@@ -5,6 +5,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONConfig;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.neo.im.chat.rpc.PresenceService;
 import com.neo.im.common.*;
@@ -66,10 +67,12 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
                     return;
                 }
                 boolean connectToCurrentServer = toAddress.sameChatHostAddress(chatServerHostAddress);
-                if (connectToCurrentServer) {
+                if (false) {
                     sendGroupMessageToChannel(userId, message);
                 } else {
-                    String params = JSONUtil.toJsonStr(message, JSONConfig.create().setDateFormat(DatePattern.NORM_DATETIME_PATTERN));
+                    JSONObject parseObj = JSONUtil.parseObj(message);
+                    parseObj.set("messageTo", userId);
+                    String params = JSONUtil.toJsonStr(parseObj, JSONConfig.create().setDateFormat(DatePattern.NORM_DATETIME_PATTERN));
                     HttpUtil.post(toAddress.getUrl() + "/api/sendGroupMessage", params);
                 }
             }

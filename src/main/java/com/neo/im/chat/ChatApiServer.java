@@ -1,5 +1,8 @@
 package com.neo.im.chat;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.neo.im.chat.entity.SendGroupMessageCommand;
+import com.neo.im.chat.entity.SendMessageCommand;
 import com.neo.im.common.payload.GroupMessage;
 import com.neo.im.common.payload.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +22,12 @@ public class ChatApiServer {
     private ChatServer chatServer;
 
     @PostMapping("/sendMessage")
-    public void sendMessage(@RequestBody Message message) {
-        chatServer.sendMessage(message);
+    public void sendMessage(@RequestBody SendMessageCommand command) {
+        chatServer.sendMessage(command);
     }
 
     @PostMapping("/sendGroupMessage")
-    public void sendGroupMessage(@RequestBody GroupMessage message) {
-        chatServer.sendGroupMessage(message);
+    public void sendGroupMessage(@RequestBody SendGroupMessageCommand command) {
+        chatServer.sendGroupMessage(command);
     }
 }

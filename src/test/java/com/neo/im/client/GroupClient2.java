@@ -17,7 +17,7 @@ public class GroupClient2 {
             System.out.println("请输入消息..");
             String content = scanner.nextLine();
             System.out.println(content);
-            client1.sendMessage(new GroupMessage(client1.getClientChatInfo().getClientId(),content, 1L));
+            client1.sendGroupMessage(new GroupMessage(client1.getClientChatInfo().getClientId(),content, 1L));
         }
     }
 }

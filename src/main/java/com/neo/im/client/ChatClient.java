@@ -53,13 +53,12 @@ public class ChatClient {
         messageCollector.send(messageOutput);
     }
 
-
     public void sendMessage(Message message) {
         MessageOutput output = new MessageOutput(Constant.MessageType.CHAT, message);
         messageCollector.send(output);
     }
 
-    public void sendMessage(GroupMessage message) {
+    public void sendGroupMessage(GroupMessage message) {
         MessageOutput output = new MessageOutput(Constant.MessageType.GROUP_CHAT, message);
         messageCollector.send(output);
     }

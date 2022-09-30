@@ -1,5 +1,8 @@
 package com.neo.im.chat;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.neo.im.chat.entity.SendGroupMessageCommand;
+import com.neo.im.chat.entity.SendMessageCommand;
 import com.neo.im.common.Constant;
 import com.neo.im.common.HostAddress;
 import com.neo.im.common.RegisterCenter;
@@ -67,11 +70,15 @@ public class ChatServer {
         );
     }
 
-    public void sendMessage(Message message) {
+    public void sendMessage(SendMessageCommand command) {
+        Message message = new Message();
+        BeanUtil.copyProperties(command, message);
         collector.sendMessageToChannel(message);
     }
 
-    public void sendGroupMessage(GroupMessage message) {
-        collector.sendGroupMessageToChannel(message);
+    public void sendGroupMessage(SendGroupMessageCommand command) {
+        GroupMessage message = new GroupMessage();
+        BeanUtil.copyProperties(command, message);
+        collector.sendGroupMessageToChannel(command.getMessageTo(), message);
     }
 }
