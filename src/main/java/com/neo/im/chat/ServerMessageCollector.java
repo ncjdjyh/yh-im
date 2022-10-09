@@ -67,7 +67,7 @@ public class ServerMessageCollector extends SimpleChannelInboundHandler<MessageI
                     return;
                 }
                 boolean connectToCurrentServer = toAddress.sameChatHostAddress(chatServerHostAddress);
-                if (false) {
+                if (connectToCurrentServer) {
                     sendGroupMessageToChannel(userId, message);
                 } else {
                     JSONObject parseObj = JSONUtil.parseObj(message);

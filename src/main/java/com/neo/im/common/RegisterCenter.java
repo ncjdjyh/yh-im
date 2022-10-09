@@ -3,16 +3,20 @@ package com.neo.im.common;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
+import com.alibaba.nacos.api.naming.listener.Event;
+import com.alibaba.nacos.api.naming.listener.EventListener;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.neo.im.common.exception.BizException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author ncjdjyh
  * @since 2022/8/18
  */
+@Slf4j
 public class RegisterCenter {
     private static final String serverList = "127.0.0.1:8848";
-    private static NamingService namingService;
+    private static final NamingService namingService;
 
     static {
         namingService = createNamingService();
@@ -27,6 +31,7 @@ public class RegisterCenter {
     }
 
     public static void register(String ip, int port, String serviceName) {
+        log.info("start register,serviceName:{}", serviceName);
         try {
             namingService.registerInstance(serviceName, ip, port);
         } catch (NacosException e) {

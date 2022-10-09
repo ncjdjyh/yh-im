@@ -1,6 +1,7 @@
-package com.neo.im.client;
+package com.neo.im.client.handler;
 
 import com.neo.im.client.config.ClientChatInfo;
+import com.neo.im.client.connect.ConnectTaskHandler;
 import com.neo.im.common.Constant;
 import com.neo.im.common.payload.Heartbeat;
 import com.neo.im.common.tranform.MessageInput;
@@ -10,15 +11,27 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 
 /**
  * @author ncjdjyh
  * @since 2022/9/18
  */
 @Slf4j
+@Service
 public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
     private ChannelHandlerContext context;
-    ClientChatInfo clientChatInfo = ClientChatInfo.getInstance();
+    private final ClientChatInfo clientChatInfo;
+    private final ConnectTaskHandler connectTaskHandler;
+
+    private boolean connected = true;
+
+    public HeartbeatSender(ClientChatInfo clientChatInfo, @Lazy ConnectTaskHandler connectTaskHandler) {
+        this.clientChatInfo = clientChatInfo;
+        this.connectTaskHandler = connectTaskHandler;
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, MessageInput messageInput) throws Exception {
@@ -44,7 +57,24 @@ public class HeartbeatSender extends SimpleChannelInboundHandler<MessageInput> {
         }
     }
 
-    public void send(MessageOutput output) {
+    public boolean send(MessageOutput output) {
+        // TODO 处理消息发送成功失败
         sendHeartbeat(this.context, output);
+        return true;
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        this.connected = false;
+        connectTaskHandler.reconnect();
+        super.channelInactive(ctx);
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 }
